@@ -1,45 +1,578 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-  <meta charset="UTF-8">
-  <title>刘直线日志记录</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>刘直线的个人主页</title>
+
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      max-width: 760px;
-      margin: 60px auto;
-      line-height: 1.8;
-      padding: 0 20px;
+    :root {
+      --bg: #f7f5f1;
+      --card: rgba(255, 255, 255, 0.72);
+      --text: #1d1d1f;
+      --muted: #6e6e73;
+      --light-muted: #8f949a;
+      --primary: #78aaa6;
+      --primary-dark: #3f716d;
+      --primary-soft: rgba(120, 170, 166, 0.13);
+      --warm-soft: rgba(241, 220, 185, 0.32);
+      --border: rgba(29, 29, 31, 0.08);
+      --shadow: 0 18px 50px rgba(29, 29, 31, 0.06);
+      --radius-large: 34px;
+      --radius-medium: 22px;
     }
 
-    h1 {
-      font-size: 36px;
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--text);
+      font-family:
+        ui-sans-serif,
+        -apple-system,
+        BlinkMacSystemFont,
+        "SF Pro Display",
+        "SF Pro Text",
+        "PingFang SC",
+        "Hiragino Sans GB",
+        "Microsoft YaHei UI",
+        "Microsoft YaHei",
+        sans-serif;
+      font-weight: 400;
+      line-height: 1.75;
+      -webkit-font-smoothing: antialiased;
+      text-rendering: optimizeLegibility;
+      background:
+        radial-gradient(circle at 12% 10%, rgba(120, 170, 166, 0.16), transparent 31%),
+        radial-gradient(circle at 90% 14%, rgba(241, 220, 185, 0.25), transparent 34%),
+        linear-gradient(135deg, #faf8f4 0%, #f1f6f5 100%);
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .page {
+      width: min(1120px, calc(100% - 48px));
+      margin: 0 auto;
+      padding: 40px 0 68px;
+    }
+
+    .navbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 72px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      font-size: 15px;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+    }
+
+    .brand-mark {
+      width: 38px;
+      height: 38px;
+      border-radius: 14px;
+      display: grid;
+      place-items: center;
+      color: white;
+      background: linear-gradient(135deg, var(--primary-dark), var(--primary));
+      box-shadow: 0 12px 28px rgba(63, 113, 109, 0.18);
+      font-size: 17px;
+      font-weight: 600;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 30px;
+      color: var(--muted);
+      font-size: 15px;
+      font-weight: 400;
+    }
+
+    .nav-links a {
+      transition: color 0.2s ease;
+    }
+
+    .nav-links a:hover {
+      color: var(--text);
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: 1.4fr 0.86fr;
+      gap: 32px;
+      margin-bottom: 32px;
     }
 
     .card {
-      border: 1px solid #ddd;
-      border-radius: 12px;
-      padding: 20px;
-      margin-top: 20px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-large);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(22px);
+    }
+
+    .hero-main {
+      min-height: 500px;
+      padding: 72px 68px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-main::after {
+      content: "";
+      position: absolute;
+      right: -84px;
+      top: -84px;
+      width: 250px;
+      height: 250px;
+      border-radius: 50%;
+      background: rgba(120, 170, 166, 0.10);
+    }
+
+    .small-pill {
+      width: fit-content;
+      padding: 7px 14px;
+      margin-bottom: 30px;
+      border-radius: 999px;
+      color: var(--primary-dark);
+      background: var(--primary-soft);
+      font-size: 14px;
+      font-weight: 500;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(46px, 6.4vw, 72px);
+      line-height: 1.12;
+      letter-spacing: -0.045em;
+      font-weight: 600;
+    }
+
+    .hero-text {
+      max-width: 620px;
+      margin: 34px 0 0;
+      color: var(--muted);
+      font-size: 20px;
+      line-height: 1.9;
+      font-weight: 400;
+    }
+
+    .hero-actions {
+      display: flex;
+      gap: 14px;
+      flex-wrap: wrap;
+      margin-top: 42px;
+    }
+
+    .button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 45px;
+      padding: 0 22px;
+      border-radius: 999px;
+      font-size: 15px;
+      font-weight: 500;
+      transition: 0.2s ease;
+    }
+
+    .button.primary {
+      color: white;
+      background: var(--primary-dark);
+      box-shadow: 0 12px 26px rgba(63, 113, 109, 0.18);
+    }
+
+    .button.primary:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 16px 32px rgba(63, 113, 109, 0.22);
+    }
+
+    .button.secondary {
+      color: var(--primary-dark);
+      background: rgba(255, 255, 255, 0.46);
+      border: 1px solid rgba(63, 113, 109, 0.14);
+    }
+
+    .button.secondary:hover {
+      background: rgba(120, 170, 166, 0.09);
+    }
+
+    .hero-side {
+      min-height: 500px;
+      padding: 44px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .avatar {
+      width: 88px;
+      height: 88px;
+      border-radius: 28px;
+      display: grid;
+      place-items: center;
+      color: white;
+      background: linear-gradient(135deg, var(--primary-dark), var(--primary));
+      box-shadow: 0 16px 36px rgba(63, 113, 109, 0.18);
+      font-size: 32px;
+      font-weight: 500;
+    }
+
+    .side-title {
+      margin: 32px 0 12px;
+      font-size: 27px;
+      line-height: 1.28;
+      letter-spacing: -0.035em;
+      font-weight: 600;
+    }
+
+    .side-text {
+      margin: 0;
+      color: var(--muted);
+      font-size: 16px;
+      line-height: 1.8;
+    }
+
+    .simple-list {
+      display: grid;
+      gap: 13px;
+      margin-top: 36px;
+    }
+
+    .simple-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      color: var(--muted);
+      font-size: 15px;
+    }
+
+    .dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--primary);
+      box-shadow: 0 0 0 6px rgba(120, 170, 166, 0.10);
+      flex: 0 0 auto;
+    }
+
+    .tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 32px;
+    }
+
+    .tag {
+      padding: 7px 12px;
+      border-radius: 999px;
+      color: var(--primary-dark);
+      background: rgba(29, 29, 31, 0.045);
+      font-size: 13px;
+      font-weight: 500;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 0.92fr 1.08fr;
+      gap: 32px;
+      margin-top: 32px;
+    }
+
+    .section {
+      padding: 46px;
+    }
+
+    .section h2 {
+      margin: 0 0 26px;
+      font-size: 34px;
+      line-height: 1.22;
+      letter-spacing: -0.04em;
+      font-weight: 600;
+    }
+
+    .section p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 18px;
+      line-height: 2;
+      font-weight: 400;
+    }
+
+    .project-list {
+      display: grid;
+      gap: 18px;
+    }
+
+    .project-item {
+      padding: 24px;
+      border-radius: var(--radius-medium);
+      border: 1px solid rgba(29, 29, 31, 0.07);
+      background: rgba(255, 255, 255, 0.44);
+      transition: 0.2s ease;
+    }
+
+    .project-item:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 14px 32px rgba(29, 29, 31, 0.055);
+      border-color: rgba(63, 113, 109, 0.16);
+    }
+
+    .project-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 12px;
+    }
+
+    .project-name {
+      font-size: 20px;
+      font-weight: 600;
+      letter-spacing: -0.03em;
+    }
+
+    .project-status {
+      padding: 5px 11px;
+      border-radius: 999px;
+      color: #8a5a13;
+      background: var(--warm-soft);
+      font-size: 12px;
+      font-weight: 500;
+      white-space: nowrap;
+    }
+
+    .project-desc {
+      color: var(--muted);
+      font-size: 16px;
+      line-height: 1.85;
+      font-weight: 400;
+    }
+
+    .now {
+      margin-top: 32px;
+      padding: 42px 46px;
+    }
+
+    .now-content {
+      display: grid;
+      grid-template-columns: 220px 1fr;
+      gap: 42px;
+      align-items: start;
+    }
+
+    .now h2 {
+      margin: 0;
+      font-size: 32px;
+      line-height: 1.24;
+      letter-spacing: -0.04em;
+      font-weight: 600;
+    }
+
+    .now p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 18px;
+      line-height: 2;
+      font-weight: 400;
+    }
+
+    footer {
+      margin-top: 46px;
+      color: var(--light-muted);
+      font-size: 14px;
+      font-weight: 400;
+      text-align: center;
+    }
+
+    @media (max-width: 900px) {
+      .page {
+        width: min(100% - 32px, 1120px);
+        padding-top: 28px;
+      }
+
+      .navbar {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 20px;
+        margin-bottom: 42px;
+      }
+
+      .hero,
+      .grid,
+      .now-content {
+        grid-template-columns: 1fr;
+      }
+
+      .hero-main,
+      .hero-side,
+      .section,
+      .now {
+        min-height: auto;
+        padding: 32px;
+      }
+
+      h1 {
+        font-size: clamp(42px, 12vw, 60px);
+      }
+
+      .hero-text,
+      .section p,
+      .now p {
+        font-size: 17px;
+      }
+
+      .nav-links {
+        flex-wrap: wrap;
+        gap: 18px;
+      }
     }
   </style>
 </head>
+
 <body>
-  <h1>你好，我是刘直线</h1>
+  <div class="page">
+    <header class="navbar">
+      <a class="brand" href="#">
+        <span class="brand-mark">刘</span>
+        <span>刘直线</span>
+      </a>
 
-  <p>这是我的个人网页。</p>
+      <nav class="nav-links">
+        <a href="#about">关于我</a>
+        <a href="#projects">我的项目</a>
+        <a href="#now">现在</a>
+      </nav>
+    </header>
 
-  <div class="card">
-    <h2>关于我</h2>
-    <p>我正在学习计算机和物理，希望把自己的项目、笔记和想法整理在这里。</p>
-  </div>
+    <main>
+      <section class="hero">
+        <section class="hero-main card">
+          <div class="small-pill">个人主页</div>
 
-  <div class="card">
-    <h2>我的项目</h2>
-    <ul>
-      <li>离散数学 课程项目</li>
+          <h1>你好，<br />我是刘直线。</h1>
 
-    </ul>
+          <p class="hero-text">
+            这里会整理我的学习记录、课程项目、技术笔记和一些随笔。
+            我希望它是一个安静、清晰、可以长期维护的个人空间。
+          </p>
+
+          <div class="hero-actions">
+            <a class="button primary" href="#projects">查看项目</a>
+            <a class="button secondary" href="#about">了解我</a>
+          </div>
+        </section>
+
+        <aside class="hero-side card">
+          <div>
+            <div class="avatar">刘</div>
+
+            <h2 class="side-title">学生 / 记录者</h2>
+
+            <p class="side-text">
+              关注计算机、物理、写作和长期积累。
+            </p>
+
+            <div class="simple-list">
+              <div class="simple-item">
+                <span class="dot"></span>
+                <span>搭建个人主页</span>
+              </div>
+
+              <div class="simple-item">
+                <span class="dot"></span>
+                <span>整理随笔日志</span>
+              </div>
+
+              <div class="simple-item">
+                <span class="dot"></span>
+                <span>归档学习内容</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="tags">
+            <span class="tag">C++</span>
+            <span class="tag">物理</span>
+            <span class="tag">笔记</span>
+            <span class="tag">写作</span>
+          </div>
+        </aside>
+      </section>
+
+      <section class="grid">
+        <section id="about" class="section card">
+          <h2>关于我</h2>
+
+          <p>
+            我正在学习计算机与物理，也在慢慢整理自己的知识系统。
+            这个网页会用来保存课程项目、技术笔记、阶段总结和一些私人化的文字。
+          </p>
+        </section>
+
+        <section id="projects" class="section card">
+          <h2>我的项目</h2>
+
+          <div class="project-list">
+            <article class="project-item">
+              <div class="project-top">
+                <div class="project-name">随笔日志</div>
+                <div class="project-status">准备中</div>
+              </div>
+
+              <div class="project-desc">
+                用来记录日常文字、学习笔记、阶段总结和一些想法。之后会做成独立入口。
+              </div>
+            </article>
+
+            <article class="project-item">
+              <div class="project-top">
+                <div class="project-name">课程项目</div>
+                <div class="project-status">规划中</div>
+              </div>
+
+              <div class="project-desc">
+                展示课程作业、代码项目和学习成果，之后按课程和主题逐步归档。
+              </div>
+            </article>
+          </div>
+        </section>
+      </section>
+
+      <section id="now" class="now card">
+        <div class="now-content">
+          <h2>现在在做什么</h2>
+
+          <p>
+            先把首页调整到舒服、克制、耐看的状态。随后再加入随笔日志，
+            让文字和 Markdown 文件可以稳定发布、展示和归档。
+          </p>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      © 2026 刘直线 · GitHub Pages
+    </footer>
   </div>
 </body>
 </html>
