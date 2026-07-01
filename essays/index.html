@@ -1,0 +1,750 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>随笔日志 · 刘直线</title>
+
+  <style>
+    :root {
+      --bg: #f7f5f1;
+      --card: rgba(255, 255, 255, 0.72);
+      --text: #1d1d1f;
+      --muted: #6e6e73;
+      --light-muted: #8f949a;
+      --primary: #78aaa6;
+      --primary-dark: #3f716d;
+      --primary-soft: rgba(120, 170, 166, 0.13);
+      --border: rgba(29, 29, 31, 0.08);
+      --shadow: 0 18px 50px rgba(29, 29, 31, 0.06);
+      --radius-large: 34px;
+      --radius-medium: 22px;
+      --radius-small: 14px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--text);
+      font-family:
+        ui-sans-serif,
+        -apple-system,
+        BlinkMacSystemFont,
+        "SF Pro Display",
+        "SF Pro Text",
+        "PingFang SC",
+        "Hiragino Sans GB",
+        "Microsoft YaHei UI",
+        "Microsoft YaHei",
+        sans-serif;
+      font-weight: 400;
+      line-height: 1.75;
+      -webkit-font-smoothing: antialiased;
+      text-rendering: optimizeLegibility;
+      background:
+        radial-gradient(circle at 12% 10%, rgba(120, 170, 166, 0.16), transparent 31%),
+        radial-gradient(circle at 90% 14%, rgba(241, 220, 185, 0.25), transparent 34%),
+        linear-gradient(135deg, #faf8f4 0%, #f1f6f5 100%);
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .page {
+      width: min(1180px, calc(100% - 48px));
+      margin: 0 auto;
+      padding: 40px 0 68px;
+    }
+
+    .navbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 64px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      font-size: 15px;
+      font-weight: 500;
+      letter-spacing: 0.02em;
+    }
+
+    .brand-mark {
+      width: 38px;
+      height: 38px;
+      border-radius: 14px;
+      display: grid;
+      place-items: center;
+      color: white;
+      background: linear-gradient(135deg, var(--primary-dark), var(--primary));
+      box-shadow: 0 12px 28px rgba(63, 113, 109, 0.18);
+      font-size: 17px;
+      font-weight: 500;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 28px;
+      color: var(--muted);
+      font-size: 15px;
+      font-weight: 400;
+    }
+
+    .nav-links a {
+      transition: color 0.2s ease;
+    }
+
+    .nav-links a:hover {
+      color: var(--text);
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-large);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(22px);
+    }
+
+    .hero {
+      padding: 64px 68px;
+      margin-bottom: 32px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero::after {
+      content: "";
+      position: absolute;
+      right: -84px;
+      top: -84px;
+      width: 250px;
+      height: 250px;
+      border-radius: 50%;
+      background: rgba(120, 170, 166, 0.10);
+    }
+
+    .small-pill {
+      width: fit-content;
+      padding: 7px 14px;
+      margin-bottom: 28px;
+      border-radius: 999px;
+      color: var(--primary-dark);
+      background: var(--primary-soft);
+      font-size: 14px;
+      font-weight: 500;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(44px, 6vw, 68px);
+      line-height: 1.12;
+      letter-spacing: -0.045em;
+      font-weight: 500;
+    }
+
+    .hero-text {
+      max-width: 700px;
+      margin: 30px 0 0;
+      color: var(--muted);
+      font-size: 20px;
+      line-height: 1.9;
+      font-weight: 400;
+    }
+
+    .workspace {
+      display: grid;
+      grid-template-columns: 320px 1fr;
+      gap: 32px;
+      align-items: start;
+    }
+
+    .sidebar {
+      padding: 30px;
+      position: sticky;
+      top: 28px;
+      max-height: calc(100vh - 56px);
+      overflow: auto;
+    }
+
+    .sidebar-head {
+      margin-bottom: 24px;
+    }
+
+    .sidebar h2 {
+      margin: 0;
+      font-size: 26px;
+      line-height: 1.24;
+      letter-spacing: -0.04em;
+      font-weight: 500;
+    }
+
+    .sidebar p {
+      margin: 10px 0 0;
+      color: var(--muted);
+      font-size: 15px;
+      line-height: 1.7;
+    }
+
+    .tree {
+      display: grid;
+      gap: 6px;
+    }
+
+    .tree details {
+      margin: 4px 0;
+    }
+
+    .tree details details {
+      margin-left: 14px;
+    }
+
+    .tree summary {
+      cursor: pointer;
+      list-style: none;
+      padding: 9px 10px;
+      border-radius: 13px;
+      color: var(--text);
+      font-size: 15px;
+      font-weight: 500;
+      transition: background 0.2s ease, color 0.2s ease;
+    }
+
+    .tree summary::-webkit-details-marker {
+      display: none;
+    }
+
+    .tree summary::before {
+      content: "›";
+      display: inline-block;
+      margin-right: 8px;
+      color: var(--light-muted);
+      transform: rotate(0deg);
+      transition: transform 0.2s ease;
+    }
+
+    .tree details[open] > summary::before {
+      transform: rotate(90deg);
+    }
+
+    .tree summary:hover {
+      background: rgba(120, 170, 166, 0.08);
+      color: var(--primary-dark);
+    }
+
+    .post-list {
+      display: grid;
+      gap: 4px;
+      margin: 4px 0 10px 22px;
+    }
+
+    .post-button {
+      width: 100%;
+      border: 0;
+      padding: 10px 12px;
+      border-radius: 13px;
+      text-align: left;
+      background: transparent;
+      color: var(--muted);
+      font: inherit;
+      cursor: pointer;
+      transition: background 0.2s ease, color 0.2s ease, transform 0.2s ease;
+    }
+
+    .post-button:hover {
+      color: var(--text);
+      background: rgba(255, 255, 255, 0.48);
+      transform: translateX(2px);
+    }
+
+    .post-button.active {
+      color: var(--primary-dark);
+      background: var(--primary-soft);
+    }
+
+    .post-title {
+      display: block;
+      font-size: 15px;
+      font-weight: 500;
+      line-height: 1.55;
+    }
+
+    .post-date {
+      display: block;
+      margin-top: 2px;
+      color: var(--light-muted);
+      font-size: 12px;
+      line-height: 1.4;
+    }
+
+    .reader {
+      min-height: 680px;
+      padding: 54px 60px;
+      overflow: hidden;
+    }
+
+    .reader-meta {
+      min-height: 24px;
+      margin-bottom: 26px;
+      color: var(--light-muted);
+      font-size: 14px;
+    }
+
+    .article-body {
+      opacity: 1;
+      transform: translateY(0);
+      transition: opacity 0.22s ease, transform 0.22s ease;
+    }
+
+    .article-body.is-loading {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+
+    .article-body h1,
+    .article-body h2,
+    .article-body h3 {
+      color: var(--text);
+      letter-spacing: -0.035em;
+      font-weight: 500;
+      line-height: 1.25;
+    }
+
+    .article-body h1 {
+      margin: 0 0 34px;
+      font-size: clamp(34px, 5vw, 50px);
+    }
+
+    .article-body h2 {
+      margin: 56px 0 20px;
+      padding-top: 24px;
+      border-top: 1px solid rgba(29, 29, 31, 0.07);
+      font-size: 28px;
+    }
+
+    .article-body h3 {
+      margin: 34px 0 14px;
+      font-size: 22px;
+    }
+
+    .article-body p {
+      margin: 18px 0;
+      color: var(--muted);
+      font-size: 18px;
+      line-height: 2;
+    }
+
+    .article-body ul,
+    .article-body ol {
+      margin: 18px 0;
+      padding-left: 1.35em;
+      color: var(--muted);
+      font-size: 18px;
+      line-height: 2;
+    }
+
+    .article-body li {
+      margin: 6px 0;
+    }
+
+    .article-body blockquote {
+      margin: 28px 0;
+      padding: 4px 0 4px 20px;
+      border-left: 3px solid var(--primary);
+      color: var(--muted);
+    }
+
+    .article-body blockquote p {
+      margin: 10px 0;
+    }
+
+    .article-body code {
+      padding: 2px 6px;
+      border-radius: 8px;
+      background: rgba(29, 29, 31, 0.055);
+      color: var(--primary-dark);
+      font-family:
+        "SFMono-Regular",
+        Consolas,
+        "Liberation Mono",
+        Menlo,
+        monospace;
+      font-size: 0.92em;
+    }
+
+    .article-body pre {
+      margin: 28px 0;
+      padding: 20px;
+      overflow: auto;
+      border-radius: 18px;
+      border: 1px solid rgba(29, 29, 31, 0.07);
+      background: rgba(255, 255, 255, 0.52);
+    }
+
+    .article-body pre code {
+      padding: 0;
+      background: transparent;
+      color: var(--text);
+      font-size: 14px;
+      line-height: 1.8;
+    }
+
+    .article-body a {
+      color: var(--primary-dark);
+      border-bottom: 1px solid rgba(63, 113, 109, 0.28);
+    }
+
+    .article-body img {
+      max-width: 100%;
+      border-radius: 20px;
+      margin: 26px 0;
+    }
+
+    .article-body table {
+      width: 100%;
+      margin: 28px 0;
+      border-collapse: collapse;
+      color: var(--muted);
+      font-size: 16px;
+    }
+
+    .article-body th,
+    .article-body td {
+      padding: 12px 14px;
+      border-bottom: 1px solid rgba(29, 29, 31, 0.08);
+      text-align: left;
+    }
+
+    .article-body th {
+      color: var(--text);
+      font-weight: 500;
+    }
+
+    .empty {
+      color: var(--muted);
+      font-size: 17px;
+      line-height: 2;
+    }
+
+    footer {
+      margin-top: 46px;
+      color: var(--light-muted);
+      font-size: 14px;
+      font-weight: 400;
+      text-align: center;
+    }
+
+    @media (max-width: 980px) {
+      .page {
+        width: min(100% - 32px, 1180px);
+        padding-top: 28px;
+      }
+
+      .navbar {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 20px;
+        margin-bottom: 42px;
+      }
+
+      .workspace {
+        grid-template-columns: 1fr;
+      }
+
+      .sidebar {
+        position: static;
+        max-height: none;
+        padding: 28px;
+      }
+
+      .hero,
+      .reader {
+        padding: 34px;
+      }
+
+      .hero-text,
+      .article-body p,
+      .article-body ul,
+      .article-body ol {
+        font-size: 17px;
+      }
+
+      .nav-links {
+        flex-wrap: wrap;
+        gap: 18px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="page">
+    <header class="navbar">
+      <a class="brand" href="../">
+        <span class="brand-mark">刘</span>
+        <span>刘直线</span>
+      </a>
+
+      <nav class="nav-links">
+        <a href="../">首页</a>
+        <a href="#catalog">目录</a>
+        <a href="#reader">阅读</a>
+      </nav>
+    </header>
+
+    <main>
+      <section class="hero card">
+        <div class="small-pill">随笔日志</div>
+
+        <h1>一些文字，慢慢保存。</h1>
+
+        <p class="hero-text">
+          这里用来放日常随笔、学习笔记、阶段总结和一些暂时还没有归类的想法。
+          目录可以继续扩展，文章使用 Markdown 编写。
+        </p>
+      </section>
+
+      <section class="workspace">
+        <aside id="catalog" class="sidebar card">
+          <div class="sidebar-head">
+            <h2>目录</h2>
+            <p>按主题和层级整理文章。</p>
+          </div>
+
+          <div id="tree" class="tree">
+            <p class="empty">目录加载中。</p>
+          </div>
+        </aside>
+
+        <article id="reader" class="reader card">
+          <div id="readerMeta" class="reader-meta"></div>
+
+          <div id="articleBody" class="article-body">
+            <p class="empty">请选择左侧目录中的一篇文章。</p>
+          </div>
+        </article>
+      </section>
+    </main>
+
+    <footer>
+      © 2026 刘直线 · 随笔日志
+    </footer>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/dompurify/dist/purify.min.js"></script>
+
+  <script>
+    const treeElement = document.getElementById("tree");
+    const articleBody = document.getElementById("articleBody");
+    const readerMeta = document.getElementById("readerMeta");
+    const reader = document.getElementById("reader");
+
+    let allPosts = [];
+    let activePath = "";
+
+    marked.setOptions({
+      gfm: true,
+      breaks: true
+    });
+
+    function collectPosts(nodes) {
+      nodes.forEach((node) => {
+        if (Array.isArray(node.posts)) {
+          node.posts.forEach((post) => allPosts.push(post));
+        }
+
+        if (Array.isArray(node.children)) {
+          collectPosts(node.children);
+        }
+      });
+    }
+
+    function createDirectoryNode(node) {
+      const details = document.createElement("details");
+      details.open = true;
+
+      const summary = document.createElement("summary");
+      summary.textContent = node.title;
+      details.appendChild(summary);
+
+      if (Array.isArray(node.posts) && node.posts.length > 0) {
+        const postList = document.createElement("div");
+        postList.className = "post-list";
+
+        node.posts.forEach((post) => {
+          const button = document.createElement("button");
+          button.className = "post-button";
+          button.type = "button";
+          button.dataset.path = post.path;
+
+          const title = document.createElement("span");
+          title.className = "post-title";
+          title.textContent = post.title;
+
+          const date = document.createElement("span");
+          date.className = "post-date";
+          date.textContent = post.date || "";
+
+          button.appendChild(title);
+          button.appendChild(date);
+
+          button.addEventListener("click", () => {
+            loadPost(post, true);
+          });
+
+          postList.appendChild(button);
+        });
+
+        details.appendChild(postList);
+      }
+
+      if (Array.isArray(node.children) && node.children.length > 0) {
+        node.children.forEach((child) => {
+          details.appendChild(createDirectoryNode(child));
+        });
+      }
+
+      return details;
+    }
+
+    function renderTree(sections) {
+      treeElement.innerHTML = "";
+
+      sections.forEach((section) => {
+        treeElement.appendChild(createDirectoryNode(section));
+      });
+    }
+
+    function setActiveButton(path) {
+      const buttons = document.querySelectorAll(".post-button");
+
+      buttons.forEach((button) => {
+        button.classList.toggle("active", button.dataset.path === path);
+      });
+    }
+
+    async function loadPost(post, shouldPushState) {
+      activePath = post.path;
+      setActiveButton(post.path);
+
+      articleBody.classList.add("is-loading");
+
+      try {
+        const response = await fetch(post.path, {
+          cache: "no-store"
+        });
+
+        if (!response.ok) {
+          throw new Error("Markdown 文件读取失败");
+        }
+
+        const markdown = await response.text();
+        const rawHtml = marked.parse(markdown);
+        const safeHtml = DOMPurify.sanitize(rawHtml);
+
+        window.setTimeout(() => {
+          readerMeta.textContent = post.date ? `${post.date} · ${post.title}` : post.title;
+          articleBody.innerHTML = safeHtml;
+          articleBody.classList.remove("is-loading");
+
+          reader.scrollIntoView({
+            behavior: "smooth",
+            block: "start"
+          });
+        }, 160);
+
+        if (shouldPushState) {
+          const url = new URL(window.location.href);
+          url.searchParams.set("post", post.path);
+          history.pushState(null, "", url);
+        }
+      } catch (error) {
+        window.setTimeout(() => {
+          readerMeta.textContent = "读取失败";
+          articleBody.innerHTML = `
+            <p class="empty">
+              没有成功读取这篇 Markdown。请检查 manifest.json 里的 path 是否和文件路径完全一致。
+            </p>
+          `;
+          articleBody.classList.remove("is-loading");
+        }, 160);
+      }
+    }
+
+    function findInitialPost(defaultPost) {
+      const params = new URLSearchParams(window.location.search);
+      const postFromUrl = params.get("post");
+
+      if (postFromUrl) {
+        const matched = allPosts.find((post) => post.path === postFromUrl);
+        if (matched) {
+          return matched;
+        }
+      }
+
+      const defaultMatched = allPosts.find((post) => post.path === defaultPost);
+      return defaultMatched || allPosts[0];
+    }
+
+    async function init() {
+      try {
+        const response = await fetch("manifest.json", {
+          cache: "no-store"
+        });
+
+        if (!response.ok) {
+          throw new Error("manifest.json 读取失败");
+        }
+
+        const manifest = await response.json();
+        const sections = manifest.sections || [];
+
+        collectPosts(sections);
+        renderTree(sections);
+
+        if (allPosts.length === 0) {
+          articleBody.innerHTML = `<p class="empty">目前还没有文章。</p>`;
+          return;
+        }
+
+        const initialPost = findInitialPost(manifest.defaultPost);
+        loadPost(initialPost, false);
+      } catch (error) {
+        treeElement.innerHTML = `
+          <p class="empty">
+            目录加载失败。请检查 essays/manifest.json 是否存在，以及 JSON 格式是否正确。
+          </p>
+        `;
+      }
+    }
+
+    window.addEventListener("popstate", () => {
+      const params = new URLSearchParams(window.location.search);
+      const path = params.get("post");
+
+      const matched = allPosts.find((post) => post.path === path);
+
+      if (matched && matched.path !== activePath) {
+        loadPost(matched, false);
+      }
+    });
+
+    init();
+  </script>
+</body>
+</html>
