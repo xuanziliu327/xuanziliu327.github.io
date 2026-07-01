@@ -548,203 +548,212 @@
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/dompurify/dist/purify.min.js"></script>
 
-  <script>
-    const treeElement = document.getElementById("tree");
-    const articleBody = document.getElementById("articleBody");
-    const readerMeta = document.getElementById("readerMeta");
-    const reader = document.getElementById("reader");
+<script>
+  const treeElement = document.getElementById("tree");
+  const articleBody = document.getElementById("articleBody");
+  const readerMeta = document.getElementById("readerMeta");
+  const reader = document.getElementById("reader");
 
-    let allPosts = [];
-    let activePath = "";
+  let allPosts = [];
+  let activePath = "";
 
-    marked.setOptions({
-      gfm: true,
-      breaks: true
+  marked.setOptions({
+    gfm: true,
+    breaks: true
+  });
+
+  function stripFrontMatter(markdown) {
+    return markdown.replace(/^---\s*[\r\n]+[\s\S]*?[\r\n]+---\s*[\r\n]*/, "");
+  }
+
+  function collectPosts(nodes) {
+    nodes.forEach((node) => {
+      if (Array.isArray(node.posts)) {
+        node.posts.forEach((post) => allPosts.push(post));
+      }
+
+      if (Array.isArray(node.children)) {
+        collectPosts(node.children);
+      }
     });
+  }
 
-    function collectPosts(nodes) {
-      nodes.forEach((node) => {
-        if (Array.isArray(node.posts)) {
-          node.posts.forEach((post) => allPosts.push(post));
-        }
+  function createDirectoryNode(node) {
+    const details = document.createElement("details");
+    details.open = true;
 
-        if (Array.isArray(node.children)) {
-          collectPosts(node.children);
-        }
+    const summary = document.createElement("summary");
+    summary.textContent = node.title;
+    details.appendChild(summary);
+
+    if (Array.isArray(node.posts) && node.posts.length > 0) {
+      const postList = document.createElement("div");
+      postList.className = "post-list";
+
+      node.posts.forEach((post) => {
+        const button = document.createElement("button");
+        button.className = "post-button";
+        button.type = "button";
+        button.dataset.path = post.path;
+
+        const title = document.createElement("span");
+        title.className = "post-title";
+        title.textContent = post.title;
+
+        const date = document.createElement("span");
+        date.className = "post-date";
+        date.textContent = post.date || "";
+
+        button.appendChild(title);
+        button.appendChild(date);
+
+        button.addEventListener("click", () => {
+          loadPost(post, true);
+        });
+
+        postList.appendChild(button);
+      });
+
+      details.appendChild(postList);
+    }
+
+    if (Array.isArray(node.children) && node.children.length > 0) {
+      node.children.forEach((child) => {
+        details.appendChild(createDirectoryNode(child));
       });
     }
 
-    function createDirectoryNode(node) {
-      const details = document.createElement("details");
-      details.open = true;
+    return details;
+  }
 
-      const summary = document.createElement("summary");
-      summary.textContent = node.title;
-      details.appendChild(summary);
+  function renderTree(sections) {
+    treeElement.innerHTML = "";
 
-      if (Array.isArray(node.posts) && node.posts.length > 0) {
-        const postList = document.createElement("div");
-        postList.className = "post-list";
+    sections.forEach((section) => {
+      treeElement.appendChild(createDirectoryNode(section));
+    });
+  }
 
-        node.posts.forEach((post) => {
-          const button = document.createElement("button");
-          button.className = "post-button";
-          button.type = "button";
-          button.dataset.path = post.path;
+  function setActiveButton(path) {
+    const buttons = document.querySelectorAll(".post-button");
 
-          const title = document.createElement("span");
-          title.className = "post-title";
-          title.textContent = post.title;
+    buttons.forEach((button) => {
+      button.classList.toggle("active", button.dataset.path === path);
+    });
+  }
 
-          const date = document.createElement("span");
-          date.className = "post-date";
-          date.textContent = post.date || "";
+  async function loadPost(post, shouldPushState) {
+    activePath = post.path;
+    setActiveButton(post.path);
 
-          button.appendChild(title);
-          button.appendChild(date);
+    articleBody.classList.add("is-loading");
 
-          button.addEventListener("click", () => {
-            loadPost(post, true);
-          });
-
-          postList.appendChild(button);
-        });
-
-        details.appendChild(postList);
-      }
-
-      if (Array.isArray(node.children) && node.children.length > 0) {
-        node.children.forEach((child) => {
-          details.appendChild(createDirectoryNode(child));
-        });
-      }
-
-      return details;
-    }
-
-    function renderTree(sections) {
-      treeElement.innerHTML = "";
-
-      sections.forEach((section) => {
-        treeElement.appendChild(createDirectoryNode(section));
+    try {
+      const response = await fetch(post.path, {
+        cache: "no-store"
       });
-    }
 
-    function setActiveButton(path) {
-      const buttons = document.querySelectorAll(".post-button");
-
-      buttons.forEach((button) => {
-        button.classList.toggle("active", button.dataset.path === path);
-      });
-    }
-
-    async function loadPost(post, shouldPushState) {
-      activePath = post.path;
-      setActiveButton(post.path);
-
-      articleBody.classList.add("is-loading");
-
-      try {
-        const response = await fetch(post.path, {
-          cache: "no-store"
-        });
-
-        if (!response.ok) {
-          throw new Error("Markdown 文件读取失败");
-        }
-
-        const markdown = await response.text();
-        const rawHtml = marked.parse(markdown);
-        const safeHtml = DOMPurify.sanitize(rawHtml);
-
-        window.setTimeout(() => {
-          readerMeta.textContent = post.date ? `${post.date} · ${post.title}` : post.title;
-          articleBody.innerHTML = safeHtml;
-          articleBody.classList.remove("is-loading");
-
-          reader.scrollIntoView({
-            behavior: "smooth",
-            block: "start"
-          });
-        }, 160);
-
-        if (shouldPushState) {
-          const url = new URL(window.location.href);
-          url.searchParams.set("post", post.path);
-          history.pushState(null, "", url);
-        }
-      } catch (error) {
-        window.setTimeout(() => {
-          readerMeta.textContent = "读取失败";
-          articleBody.innerHTML = `
-            <p class="empty">
-              没有成功读取这篇 Markdown。请检查 manifest.json 里的 path 是否和文件路径完全一致。
-            </p>
-          `;
-          articleBody.classList.remove("is-loading");
-        }, 160);
-      }
-    }
-
-    function findInitialPost(defaultPost) {
-      const params = new URLSearchParams(window.location.search);
-      const postFromUrl = params.get("post");
-
-      if (postFromUrl) {
-        const matched = allPosts.find((post) => post.path === postFromUrl);
-        if (matched) {
-          return matched;
-        }
+      if (!response.ok) {
+        throw new Error("Markdown 文件读取失败");
       }
 
-      const defaultMatched = allPosts.find((post) => post.path === defaultPost);
-      return defaultMatched || allPosts[0];
-    }
+      const markdown = await response.text();
 
-    async function init() {
-      try {
-        const response = await fetch("manifest.json", {
-          cache: "no-store"
+      // 关键改动：
+      // 去掉 Markdown 文件开头的 title/date 元信息，避免显示给浏览者。
+      const cleanMarkdown = stripFrontMatter(markdown);
+
+      const rawHtml = marked.parse(cleanMarkdown);
+      const safeHtml = DOMPurify.sanitize(rawHtml);
+
+      window.setTimeout(() => {
+        readerMeta.textContent = post.date ? `${post.date} · ${post.title}` : post.title;
+        articleBody.innerHTML = safeHtml;
+        articleBody.classList.remove("is-loading");
+
+        reader.scrollIntoView({
+          behavior: "smooth",
+          block: "start"
         });
+      }, 160);
 
-        if (!response.ok) {
-          throw new Error("manifest.json 读取失败");
-        }
-
-        const manifest = await response.json();
-        const sections = manifest.sections || [];
-
-        collectPosts(sections);
-        renderTree(sections);
-
-        if (allPosts.length === 0) {
-          articleBody.innerHTML = `<p class="empty">目前还没有文章。</p>`;
-          return;
-        }
-
-        const initialPost = findInitialPost(manifest.defaultPost);
-        loadPost(initialPost, false);
-      } catch (error) {
-        treeElement.innerHTML = `
+      if (shouldPushState) {
+        const url = new URL(window.location.href);
+        url.searchParams.set("post", post.path);
+        history.pushState(null, "", url);
+      }
+    } catch (error) {
+      window.setTimeout(() => {
+        readerMeta.textContent = "读取失败";
+        articleBody.innerHTML = `
           <p class="empty">
-            目录加载失败。请检查 essays/manifest.json 是否存在，以及 JSON 格式是否正确。
+            没有成功读取这篇 Markdown。请检查文件路径是否正确。
           </p>
         `;
+        articleBody.classList.remove("is-loading");
+      }, 160);
+    }
+  }
+
+  function findInitialPost(defaultPost) {
+    const params = new URLSearchParams(window.location.search);
+    const postFromUrl = params.get("post");
+
+    if (postFromUrl) {
+      const matched = allPosts.find((post) => post.path === postFromUrl);
+      if (matched) {
+        return matched;
       }
     }
 
-    window.addEventListener("popstate", () => {
-      const params = new URLSearchParams(window.location.search);
-      const path = params.get("post");
+    const defaultMatched = allPosts.find((post) => post.path === defaultPost);
+    return defaultMatched || allPosts[0];
+  }
 
-      const matched = allPosts.find((post) => post.path === path);
+  async function init() {
+    try {
+      const response = await fetch("manifest.json", {
+        cache: "no-store"
+      });
 
-      if (matched && matched.path !== activePath) {
-        loadPost(matched, false);
+      if (!response.ok) {
+        throw new Error("manifest.json 读取失败");
       }
-    });
 
-    init();
-  </script>
+      const manifest = await response.json();
+      const sections = manifest.sections || [];
+
+      collectPosts(sections);
+      renderTree(sections);
+
+      if (allPosts.length === 0) {
+        articleBody.innerHTML = `<p class="empty">目前还没有文章。</p>`;
+        return;
+      }
+
+      const initialPost = findInitialPost(manifest.defaultPost);
+      loadPost(initialPost, false);
+    } catch (error) {
+      treeElement.innerHTML = `
+        <p class="empty">
+          目录加载失败。请检查 essays/manifest.json 是否存在，以及 JSON 格式是否正确。
+        </p>
+      `;
+    }
+  }
+
+  window.addEventListener("popstate", () => {
+    const params = new URLSearchParams(window.location.search);
+    const path = params.get("post");
+
+    const matched = allPosts.find((post) => post.path === path);
+
+    if (matched && matched.path !== activePath) {
+      loadPost(matched, false);
+    }
+  });
+
+  init();
+</script>
 </body>
 </html>
