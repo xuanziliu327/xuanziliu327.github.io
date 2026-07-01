@@ -31,6 +31,12 @@
       scroll-behavior: smooth;
     }
 
+    #about,
+    #projects,
+    #now {
+      scroll-margin-top: 36px;
+    }
+
     body {
       margin: 0;
       min-height: 100vh;
@@ -489,7 +495,7 @@
             <h2 class="side-title">学生 / 记录者</h2>
 
             <p class="side-text">
-              关注计算机、解谜游戏、写作和长期积累。
+              关注计算机、物理、写作和长期积累。
             </p>
 
             <div class="simple-list">
@@ -512,7 +518,7 @@
 
           <div class="tags">
             <span class="tag">C++</span>
-            <span class="tag">puzzle game</span>
+            <span class="tag">物理</span>
             <span class="tag">笔记</span>
             <span class="tag">写作</span>
           </div>
@@ -524,8 +530,8 @@
           <h2>关于我</h2>
 
           <p>
-            我正在学习计算机专业，也在慢慢整理自己的知识系统。
-            这个网页会用来保存课程项目、技术笔记、阶段总结和一些私人随笔。
+            我正在学习计算机与物理，也在慢慢整理自己的知识系统。
+            这个网页会用来保存课程项目、技术笔记、阶段总结和一些私人化的文字。
           </p>
         </section>
 
@@ -574,5 +580,43 @@
       © 2026 刘直线 · GitHub Pages
     </footer>
   </div>
+
+  <script>
+    const links = document.querySelectorAll('a[href^="#"]');
+
+    links.forEach((link) => {
+      link.addEventListener("click", function (event) {
+        const targetId = this.getAttribute("href");
+
+        if (targetId === "#") {
+          event.preventDefault();
+          window.scrollTo({
+            top: 0,
+            behavior: "smooth"
+          });
+          return;
+        }
+
+        const target = document.querySelector(targetId);
+
+        if (!target) {
+          return;
+        }
+
+        event.preventDefault();
+
+        const offset = 36;
+        const targetPosition =
+          target.getBoundingClientRect().top + window.pageYOffset - offset;
+
+        window.scrollTo({
+          top: targetPosition,
+          behavior: "smooth"
+        });
+
+        history.pushState(null, "", targetId);
+      });
+    });
+  </script>
 </body>
 </html>
