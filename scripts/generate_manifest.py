@@ -20,6 +20,7 @@ DISPLAY_NAMES = {
     "mechanics": "力学",
     "notes": "笔记",
     "misc": "杂项",
+    "practise": "随笔练习",
 }
 
 
